@@ -1,7 +1,26 @@
 import React from 'react'
+import { useRef } from 'react';
 import './login.css'
+import {loginCall} from '../../apiCalls'
+import { useContext } from 'react';
+import { AuthContext} from '../../context/AuthContext';
+import { CircularProgress } from '@mui/material';
+import { Navigate } from 'react-router-dom';
+ 
 function Login() {
+    const email = useRef();
+    const password = useRef();
+    const {user,isFetching,error,dispatch} = useContext(AuthContext)
+    const handleSubmit = (e) =>{
+        e.preventDefault();
+         loginCall({email:email.current.value,password:password.current.value},dispatch);
+         console.log(user)
+    }
     return (
+        <>
+        {user && (
+            <Navigate to="/" replace={true} />
+          )}
         <div className="login">
             <div className="login__Wrapper">
                 <div className="login__Left">
@@ -10,16 +29,17 @@ function Login() {
                     </span>
                 </div>    
                 <div className="login__Right">
-                    <div className="login__Box">
-                        <input placeholder="Email" className="login__Input" />
-                        <input placeholder="Password" className="login__Input" />
-                        <button className="login__Button">Log In</button>
+                    <form onSubmit={handleSubmit} className="login__Box">
+                        <input placeholder="Email" type="email" required  ref = {email}className="login__Input" />
+                        <input placeholder="Password" type="password" required minLength="5" ref={password} className="login__Input" />
+                        <button disabled={isFetching} className="login__Button" > Log in</button>
                         <span className="login__Forgot">Forgot Password?</span>
-                        <button className="login__RegisterButton">Create a New Account</button>
-                    </div>
+                        <button disabled={isFetching}  className="login__RegisterButton">Create a new Account</button>
+                    </form> 
                 </div>    
             </div>            
         </div>
+    </>
     )
 }
 

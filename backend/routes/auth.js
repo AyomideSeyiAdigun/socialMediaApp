@@ -37,7 +37,8 @@ router.post("/login", async (req,res)=>{
         !validatePassword && res.status(400).json("wrong email or password!");
 
         //send res
-        res.status(200).json({_id:user._id,email:user.email})
+        const {password,updatedAt, ...other} =user._doc
+        res.status(200).json(other)
         
     } catch (error) {
         res.status(500).json(error)

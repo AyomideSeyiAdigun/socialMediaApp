@@ -46,9 +46,11 @@ router.delete("/:id",async(req,res)=>{
 
   // get a user 
 
-  router.get("/:id",async(req,res)=>{
+  router.get("/",async(req,res)=>{
+      const userId = req.query.userId;
+      const username = req.query.username
       try {
-          const user = await User.findById(req.params.id);
+          const user = userId ?  await User.findById(userId) : await User.findOne({username:username});
           const {password,updatedAt, ...other} =user._doc
           res.status(200).json(other)
       } catch (err) {
@@ -102,5 +104,29 @@ router.delete("/:id",async(req,res)=>{
        
     }
   })
+
+  //get a friend
+
+  router.get("/friends/:userId", async (rea,res)=>{
+      try {
+          const user = await User.findOne(req.params.userId);
+          const freonds = await Promide.all(
+              user.followings.map(friendId=> {
+                  return User.findById(friendId);
+              })
+          );
+          let freiendList = [];
+          freiendList.map((friend)=>{
+              const {_id,username,profilePicture} = friend;
+              friendList.push( {_id,username,profilePicture} );
+          });
+          res.status(200).json(friendList)
+      }catch(err) {
+        res.status(500).json(err)
+      }
+  })
+
+
+ 
 
 module.exports = router
